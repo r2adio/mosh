@@ -70,21 +70,23 @@ void handle_exit(const std::vector<std::string> &tokens) {
   if (tokens.size() == 1) {
     std::cout << "Exiting with code 0\n";
     std::exit(0);
-  } else if (tokens.size() == 2 && is_int(tokens[1])) {
+  } 
+  else if (tokens.size() == 2 && is_int(tokens[1])) {
     int exit_code = std::stoi(tokens[1]);
     std::cout << "Exiting with code " << exit_code << "\n";
     std::exit(exit_code);
-  } else {
+  } 
+  else
     std::cout << "exit: argument must be an integer\n";
-  }
 }
 
+//helps input to divide into separate tokens
 std::vector<std::string> tokensize(const std::string &input) {
-  std::istringstream iss(input);
+  std::istringstream splits(input);  //istringstream splits on spaces
   std::vector<std::string> tokens;
   std::string token;
 
-  while (iss >> token) {
+  while (splits >> token) {  // reads words one by one
     tokens.push_back(token);
   }
   return tokens;
@@ -107,8 +109,8 @@ int main() {
       continue;
     }
 
+    // always takes first wrd as command
     std::string command = tokens[0];
-
     // Handle built-in 'exit'
     if (command == "exit") {
       handle_exit(tokens);
@@ -130,7 +132,7 @@ int main() {
     }
     // If not a built-in, print "command not found"
     else {
-      std::cout << command << ": command not found\n";
+      std::cout << command << ": cmd not found\n";
     }
 
     std::cout << "$ ";
