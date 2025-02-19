@@ -1,142 +1,236 @@
-#include <cctype>
+#include <sys/wait.h>
+#include <sys/types.h>
+#include <algorithm>
 #include <cstdlib>
-#include <cstring>
-#include <iostream>
-#include <string>
-#include <unistd.h>
-// access(), check file execution permisions
-#include <vector>
-// manages buil-in cmds dynamically
-#include <sstream>
-// useful for handling input parsing
 #include <filesystem>
+#include <iostream>
+#include <unistd.h>
+#include <vector>
 
-std::vector<std::string> builtins = {"echo", "exit", "type"};
+enum CommandType {
+  Builtin,
+  Executable,
+  Nonexistent,
+};
 
-bool is_builtin(const std::string &cmd) {
-  for (const std::string &builtin : builtins) {
-    if (cmd == builtin)
-      return true;
+struct FullCommandType {
+  CommandType type;
+  std::string executable_path;
+};
+
+std::vector<std::string> parse_command_to_string_vector(std::string command);
+FullCommandType command_to_full_command_type(std::string command);
+std::string find_command_executable_path(std::string command);
+std::string find_command_in_path(std::string command, std::string path);
+
+int main() {
+  // Flush after every std::cout / std:cerr
+  std::cout << std::unitbuf;
+  std::cerr << std::unitbuf;
+
+  while (true) {
+    std::cout << "$ ";
+
+    std::string input;
+    std::getline(std::cin, input);
+
+    std::vector<std::string> command_vector =
+        parse_command_to_string_vector(input);
+
+    if (command_vector.size() == 0) {
+      continue;
+    }
+
+    FullCommandType fct = command_to_full_command_type(command_vector[0]);
+
+    // handle builtin commands
+    if (fct.type == Builtin) {
+      if (command_vector[0] == "exit") {
+        int exit_code = std::stoi(command_vector[1]);
+        return exit_code;
+      }
+
+      if (command_vector[0] == "echo") {
+        for (int i = 1; i < command_vector.size(); i++) {
+          // print a space before every item that is not the first
+          if (i != 1) {
+            std::cout << " ";
+          }
+
+          std::cout << command_vector[i];
+        }
+
+        std::cout << "\n";
+        continue;
+      }
+
+      if (command_vector[0] == "type") {
+        if (command_vector.size() < 2) {
+          continue;
+        }
+
+        std::string command_name = command_vector[1];
+        FullCommandType command_type =
+            command_to_full_command_type(command_name);
+
+        switch (command_type.type) {
+        case Builtin:
+          std::cout << command_name << " is a shell builtin\n";
+          break;
+        case Executable:
+          std::cout << command_name << " is " << command_type.executable_path
+                    << "\n";
+          break;
+        case Nonexistent:
+          std::cout << command_name << " not found\n";
+          break;
+        default:
+          break;
+        }
+
+        continue;
+      }
+
+      continue;
+    }
+
+    if (fct.type == Executable) {
+      // Extract just the filename for the first argument
+      std::string executable_name =
+          std::filesystem::path(fct.executable_path).filename();
+
+      // Use execv instead of system, which gives more control over the
+      // arguments
+      std::vector<char *> args;
+      args.push_back(const_cast<char *>(
+          executable_name.c_str())); // Program name as first arg
+
+      // Add remaining arguments
+      for (int argn = 1; argn < command_vector.size(); argn++) {
+        args.push_back(const_cast<char *>(command_vector[argn].c_str()));
+      }
+      args.push_back(nullptr); // Null-terminate the args array
+
+      // Fork and execute
+      pid_t pid = fork();
+      if (pid == 0) {
+        // Child process
+        execv(fct.executable_path.c_str(), args.data());
+        // If execv returns, there was an error
+        perror("execv");
+        exit(1);
+      } else if (pid > 0) {
+        // Parent process
+        int status;
+        waitpid(pid, &status, 0);
+      } else {
+        // Fork failed
+        perror("fork");
+      }
+
+      continue;
+    }
+
+    std::cout << input << ": command not found\n";
   }
-  return false;
 }
 
-std::string find_in_path(const std::string &cmd) {
-  const char *path = getenv("PATH");
-  if (!path)
+std::vector<std::string> parse_command_to_string_vector(std::string command) {
+  std::vector<std::string> args;
+  std::string arg_acc = "";
+
+  for (char c : command) {
+    if (c == ' ') {
+      args.push_back(arg_acc);
+      arg_acc = "";
+    } else {
+      arg_acc += c;
+    }
+  }
+
+  if (arg_acc != "") {
+    args.push_back(arg_acc);
+  }
+
+  return args;
+}
+
+// returns the full command type of a command (without arguments)
+FullCommandType command_to_full_command_type(std::string command) {
+  std::vector<std::string> builtin_commands = {"exit", "echo", "type"};
+
+  // handle builtin commands
+  if (std::find(builtin_commands.begin(), builtin_commands.end(), command) !=
+      builtin_commands.end()) {
+    FullCommandType fct;
+    fct.type = CommandType::Builtin;
+
+    return fct;
+  }
+
+  // check if the command is found in path
+  std::string exec_path = find_command_executable_path(command);
+  if (exec_path != "") {
+    FullCommandType fct;
+    fct.type = Executable;
+    fct.executable_path =
+        exec_path; // Store the full path instead of just the filename
+    return fct;
+  }
+
+  // nonexistent types
+  FullCommandType fct;
+  fct.type = CommandType::Nonexistent;
+  return fct;
+}
+
+std::string find_command_executable_path(std::string command) {
+  char *path = getenv("PATH");
+
+  if (path == NULL) {
     return "";
+  }
 
-  std::istringstream stream(path);
-  std::string directory;
+  std::string path_acc = "";
 
-  while (std::getline(stream, directory, ':')) {
-    std::filesystem::path full_path = std::filesystem::path(directory) / cmd;
-    if (std::filesystem::exists(full_path) &&
-        std::filesystem::is_regular_file(full_path)) {
-      return full_path.string();
+  // accumulate values in path_acc
+  // and search whenever the directory is complete
+  char *p = path;
+  while (*p != '\0') {
+    // search for end of paths
+    if (*p == ':') {
+      std::string exec_path = find_command_in_path(command, path_acc);
+
+      if (exec_path != "") {
+        return exec_path;
+      }
+
+      path_acc = "";
+    } else {
+      path_acc += *p;
+    }
+    p++;
+  }
+
+  // handle the last path in the string
+  std::string exec_path = find_command_in_path(command, path_acc);
+
+  if (exec_path != "") {
+    return exec_path;
+  }
+
+  return "";
+}
+
+std::string find_command_in_path(std::string command, std::string path) {
+  for (const auto &entry : std::filesystem::directory_iterator(path)) {
+    if (entry.path() == (path + "/" + command)) {
+      // Check if the file is executable
+      if (access(entry.path().c_str(), X_OK) == 0) {
+        return entry.path();
+      }
     }
   }
   return "";
 }
 
-void shell_type(const std::string &cmd) {
-  if (cmd.empty()) {
-    std::cout << "type: missing argument\n";
-    return;
-  }
-
-  if (is_builtin(cmd))
-    std::cout << cmd << " is a shell builtin\n";
-
-  std::string path = find_in_path(cmd);
-  if (!path.empty())
-    std::cout << cmd << " is " << path << "\n";
-  else
-    std::cout << cmd << ": not found\n";
-}
-
-// checks if string is valid integer
-bool is_int(const std::string &str) {
-  try {
-    size_t pos;
-    std::stoi(str, &pos);
-    return pos == str.size(); // ensure entire string is parsed
-  } catch (...) {
-    return false;
-  }
-}
-// function to process exit cmd
-void handle_exit(const std::vector<std::string> &tokens) {
-  if (tokens.size() == 1) {
-    std::cout << "Exiting with code 0\n";
-    std::exit(0);
-  } 
-  else if (tokens.size() == 2 && is_int(tokens[1])) {
-    int exit_code = std::stoi(tokens[1]);
-    std::cout << "Exiting with code " << exit_code << "\n";
-    std::exit(exit_code);
-  } 
-  else
-    std::cout << "exit: argument must be an integer\n";
-}
-
-//helps input to divide into separate tokens
-std::vector<std::string> tokensize(const std::string &input) {
-  std::istringstream splits(input);  //istringstream splits on spaces
-  std::vector<std::string> tokens;
-  std::string token;
-
-  while (splits >> token) {  // reads words one by one
-    tokens.push_back(token);
-  }
-  return tokens;
-}
-
-int main() {
-  // enables or diables automatic flushing of the output stream after any output
-  // operation, std::cout / std:cerr
-  std::cout << std::unitbuf;
-  std::cerr << std::unitbuf;
-
-  std::cout << "$ ";
-  std::string input;
-
-  while (std::getline(std::cin, input)) {
-    std::vector<std::string> tokens = tokensize(input);
-
-    if (tokens.empty()) {
-      std::cout << "$ ";
-      continue;
-    }
-
-    // always takes first wrd as command
-    std::string command = tokens[0];
-    // Handle built-in 'exit'
-    if (command == "exit") {
-      handle_exit(tokens);
-    }
-    // Handle built-in 'echo'
-    else if (command == "echo") {
-      for (size_t i = 1; i < tokens.size(); i++) {
-        std::cout << tokens[i] << " ";
-      }
-      std::cout << std::endl;
-    }
-    // Handle built-in 'type'
-    else if (command == "type") {
-      if (tokens.size() > 1) {
-        shell_type(tokens[1]); // Pass the second argument to type command
-      } else {
-        std::cout << "type: missing argument\n";
-      }
-    }
-    // If not a built-in, print "command not found"
-    else {
-      std::cout << command << ": cmd not found\n";
-    }
-
-    std::cout << "$ ";
-  }
-
-  return 0;
-}
