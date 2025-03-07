@@ -1,21 +1,21 @@
-#include <sys/wait.h>
-#include <sys/types.h>
 #include <algorithm>
 #include <cstdlib>
 #include <filesystem>
 #include <iostream>
+#include <sys/types.h>
+#include <sys/wait.h>
 #include <unistd.h>
 #include <vector>
 
 enum CommandType {
-  Builtin,
-  Executable,
-  Nonexistent,
+  Builtin,     // internal command of shell
+  Executable,  // external programs
+  Nonexistent, // zzz
 };
 
 struct FullCommandType {
   CommandType type;
-  std::string executable_path;
+  std::string executable_path; // path to executable
 };
 
 std::vector<std::string> parse_command_to_string_vector(std::string command);
@@ -34,6 +34,7 @@ int main() {
     std::string input;
     std::getline(std::cin, input);
 
+    // parsing the user input
     std::vector<std::string> command_vector =
         parse_command_to_string_vector(input);
 
@@ -41,6 +42,7 @@ int main() {
       continue;
     }
 
+    //classifies the command into builtin, executable,nonexistent
     FullCommandType fct = command_to_full_command_type(command_vector[0]);
 
     // handle builtin commands
@@ -159,7 +161,7 @@ std::vector<std::string> parse_command_to_string_vector(std::string command) {
 FullCommandType command_to_full_command_type(std::string command) {
   std::vector<std::string> builtin_commands = {"exit", "echo", "type"};
 
-  // handle builtin commands
+  // checks if builtin command
   if (std::find(builtin_commands.begin(), builtin_commands.end(), command) !=
       builtin_commands.end()) {
     FullCommandType fct;
@@ -222,15 +224,36 @@ std::string find_command_executable_path(std::string command) {
   return "";
 }
 
+//std::string find_command_in_path(std::string command, std::string path) {
+//  for (const auto &entry : std::filesystem::directory_iterator(path)) {
+//    if (entry.path() == (path + "/" + command)) {
+//      // Check if the file is executable
+//      if (access(entry.path().c_str(), X_OK) == 0) {
+//        return entry.path();
+//      }
+//    }
+//  }
+//  return "";
+//}
 std::string find_command_in_path(std::string command, std::string path) {
-  for (const auto &entry : std::filesystem::directory_iterator(path)) {
-    if (entry.path() == (path + "/" + command)) {
-      // Check if the file is executable
-      if (access(entry.path().c_str(), X_OK) == 0) {
-        return entry.path();
-      }
+    // Check if the directory exists before trying to iterate
+    if (!std::filesystem::exists(path) || !std::filesystem::is_directory(path)) {
+        return "";
     }
-  }
-  return "";
+    
+    try {
+        for (const auto &entry : std::filesystem::directory_iterator(path)) {
+            if (entry.path() == (path + "/" + command)) {
+                // Check if the file is executable
+                if (access(entry.path().c_str(), X_OK) == 0) {
+                    return entry.path();
+                }
+            }
+        }
+    } catch (const std::filesystem::filesystem_error& e) {
+        // Handle filesystem errors gracefully
+        std::cerr << "Warning: Could not search path: " << path << " (" << e.what() << ")\n";
+    }
+    
+    return "";
 }
-
