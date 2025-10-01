@@ -1,13 +1,28 @@
-#include "main.h"
+#include "shell.h"
 
-int main(int argc, char *argv[]) {
-  (void)argc;
-  int status;
+void event_loop(void) {
+  char *input = NULL;    // storing input value
+  size_t input_size = 0; // storing input size
 
-  // child process
-  if (fork() == 0)
-    execvp(argv[1], argv + 1);
+  char **args; // storing arguments
 
-  wait(&status);
-  return EXIT_SUCCESS;
+  while (1) {
+    printf("ゝ");                                    // ctrl+k *5
+    if (getline(&input, &input_size, stdin) == -1) { // EOF, ctrl+d
+      perror("getline");
+      break;
+    }
+    // printf("cmd: %s", input);
+
+    args = parser(input);
+
+    for (size_t i = 0; args[i]; i++) {
+      printf("Args: %s\n", args[i]);
+    }
+  }
+}
+
+int main(void) {
+  event_loop();
+  return 0;
 }

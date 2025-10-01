@@ -6,3 +6,6 @@ build:
 
 run: build build
 	./build/mosh
+
+clean:
+	rm -r build/ .cache/

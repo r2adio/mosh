@@ -1,10 +1,11 @@
-#ifndef MAIN_H
-#define MAIN_H
+#ifndef SHELL_H
+#define SHELL_H
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 
 #define MAX_INPUT 1024
+char **parser(char *input);
 
-#endif
+#endif /* SHELL_H */
