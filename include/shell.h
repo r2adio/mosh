@@ -7,6 +7,8 @@
 #include <unistd.h> // for POSIX operating system API (e.g., fork, exec)
 
 #define MAX_INPUT 1024
+
 char **parser(char *input);
+void free_tokens(char **tokens);
 
 #endif /* SHELL_H */

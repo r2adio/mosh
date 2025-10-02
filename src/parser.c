@@ -18,7 +18,12 @@ char **parser(char *input) {
   for (size_t i = 0; input[i]; i++) {
     token = &input[i];
     // input[i] && input[i] != ' ' -> ??
-    // &&input[i] is a safeguard to avoid segmentation fault
+    // in c, every char is also an integer value.
+    // the null character(\0), which marks the end of a string, has a value of 0
+    // and, any other character has a non-zero value.
+    //
+    // thus, first check is for null terminator(\0), the end of a string,
+    // and second checks if the character at the current position is not a ' '.
     while (input[i] && input[i] != ' ') {
       token_len++;
       i++;
@@ -42,4 +47,15 @@ char **parser(char *input) {
   tokens[position] = NULL; // null terminator at the end of tokens array
 
   return tokens;
+}
+
+// free the allocated memory for tokens
+void free_tokens(char **tokens) {
+  if (tokens) // check if tokens is not null
+    return;
+
+  for (size_t i = 0; tokens[i]; i++) {
+    free(tokens[i]); // free memory for each token
+  }
+  free(tokens); // free memory for tokens array
 }

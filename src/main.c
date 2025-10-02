@@ -1,6 +1,6 @@
 #include "shell.h"
 
-void event_loop(void) {
+void event_loop(char **env) {
   char *input = NULL;    // storing input value
   size_t input_size = 0; // storing input size
 
@@ -24,9 +24,17 @@ void event_loop(void) {
       printf("Args: %s\n", args[i]);
     }
   }
+  free_tokens(args); // free allocated memory for tokens
 }
 
-int main(void) {
-  event_loop();
+/* The `env` parameter holds the environment variables passed from the parent
+ * process. It is essential for a shell's functionality, such as locating
+ * executables in the PATH, expanding variables, and passing the environment
+ * to child processes.
+ */
+int main(int argc, char **argv, char **env) {
+  (void)argc;
+  (void)argv;
+  event_loop(env);
   return 0;
 }
