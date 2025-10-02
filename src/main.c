@@ -9,8 +9,12 @@ void event_loop(void) {
   while (1) {
     printf("ゝ");                                    // ctrl+k *5
     if (getline(&input, &input_size, stdin) == -1) { // EOF, ctrl+d
-      perror("getline");
-      break;
+      if (feof(stdin))                               // checks for EOF
+        break;               // handles EOF gracefully, and exits the loop
+      else if (errno != 0) { // checks for an actual error
+        perror("getline");
+        break;
+      }
     }
     // printf("cmd: %s", input);
 
