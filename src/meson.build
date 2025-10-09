@@ -1,1 +1,1 @@
-src_dir = files('main.c', 'parser.c')
+src_dir = files('built-in.c', 'main.c', 'parser.c')
