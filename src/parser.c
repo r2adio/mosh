@@ -16,15 +16,20 @@ char **parser(char *input) {
   }
 
   for (size_t i = 0; input[i]; i++) {
+    // skips whitespace characters: space, newline, tab, carriage return, and
+    // alert
+    while (input[i] == ' ' || input[i] == '\n' || input[i] == '\t' ||
+           input[i] == '\r' || input[i] == '\a') {
+      i++;
+    }
+    if (input[i] == '\0')
+      break;
+
     token = &input[i];
-    // input[i] && input[i] != ' ' -> ??
-    // in c, every char is also an integer value.
-    // the null character(\0), which marks the end of a string, has a value of 0
-    // and, any other character has a non-zero value.
-    //
-    // thus, first check is for null terminator(\0), the end of a string,
-    // and second checks if the character at the current position is not a ' '.
-    while (input[i] && input[i] != ' ') {
+    // check for null terminator, space, newline, tab, carriage return, and
+    // alert
+    while (input[i] != '\0' && input[i] != ' ' && input[i] != '\n' &&
+           input[i] != '\t' && input[i] != '\r' && input[i] != '\a') {
       token_len++;
       i++;
     }

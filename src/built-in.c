@@ -9,13 +9,13 @@ int builtin(char **args, char **env, char *init_dir) {
     } else {
       printf("cd: %s\n", args[1]);
     }
-  } else if (!strcmp(args[0], "pwd\n")) {
+  } else if (!strcmp(args[0], "pwd")) {
     if (chdir(init_dir) == -1) {
       perror("chdir");
       return 1;
     }
     printf("pwd: %s\n", init_dir);
-  } else if (!strcmp(args[0], "exit\n")) {
+  } else if (!strcmp(args[0], "exit")) {
     exit(EXIT_SUCCESS);
   } else { // not  a builtin command
     printf("not a builtin command\n");
