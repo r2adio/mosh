@@ -1,10 +1,10 @@
 #include "shell.h"
 
 int builtin(char **args, char **env, char *init_dir) {
-  printf("builtin: %s\n", args[0]);
-  if (!strcmp(args[0], "cd")) {
+  // printf("builtin: %s\n", args[0]);
+  if (!strcmp(args[0], "cd")) { // command: cd [dir_path]
     if (chdir(args[1]) == -1) {
-      perror("chdir");
+      perror("cd");
       return 1;
     } else {
       printf("cd: %s\n", args[1]);
