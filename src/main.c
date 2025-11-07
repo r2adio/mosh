@@ -1,5 +1,22 @@
 #include "shell.h"
 
+// built-in: cd pwd exit echo alias source which type env setenv unsetenv
+int builtin(char **args, char **env, char *init_dir) {
+  if (!strcmp(args[0], "cd")) {
+    return cd_cmd(args, init_dir);
+
+  } else if (!strcmp(args[0], "pwd")) {
+    return pwd_cmd();
+
+  } else if (!strcmp(args[0], "exit")) {
+    exit(EXIT_SUCCESS);
+
+  } else {
+    // binary: ls grep find cat cp mv rm mkdir tar
+  }
+  return EXIT_SUCCESS;
+}
+
 void event_loop(char **env) {
   char *input = NULL;    // storing input value
   size_t input_size = 0; // storing input size
@@ -41,5 +58,5 @@ int main(int argc, char **argv, char **env) {
   (void)argc;
   (void)argv;
   event_loop(env);
-  return 0;
+  return EXIT_SUCCESS;
 }

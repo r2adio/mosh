@@ -1,29 +1,27 @@
 #include "shell.h"
 
-int builtin(char **args, char **env, char *init_dir) {
-  // command: cd [dir_path]
-  if (!strcmp(args[0], "cd")) {
-    if (chdir(args[1]) == -1) {
-      perror("cd");
-      return 1;
-    }
-    printf("cd: %s\n", args[1]);
-
-    // command: pwd
-  } else if (!strcmp(args[0], "pwd")) {
-    if (chdir(init_dir) == -1) {
-      perror("chdir");
-      return 1;
-    }
-    printf("pwd: %s\n", init_dir);
-
-    // command: exit
-  } else if (!strcmp(args[0], "exit")) {
-    exit(EXIT_SUCCESS);
-
-    // not  a builtin command
-  } else {
-    printf("not a builtin command\n");
+// built-in: cd pwd exit echo alias source which type env setenv unsetenv
+int cd_cmd(char **args, char *init_dir) {
+  if (chdir(args[1]) == -1) {
+    perror("cd");
+    return EXIT_FAILURE;
   }
-  return 0;
+  printf("cd: %s\n", args[1]);
+  return EXIT_SUCCESS;
 }
+
+int pwd_cmd() {
+  char *cwd = getcwd(NULL, 0);
+  if (cwd == NULL) {
+    perror("pwd");
+    return EXIT_FAILURE;
+  }
+  printf("pwd: %s\n", cwd); // print current working directory
+  return EXIT_SUCCESS;
+}
+
+int echo_cmd(char **args, char **env);
+
+int env_cmd(char **env);
+
+int which_cmd(char **args, char **env);

@@ -13,4 +13,11 @@ char **parser(char *input);
 void free_tokens(char **tokens);
 int builtin(char **args, char **env, char *init_dir);
 
+// built-in commands:
+int cd_cmd(char **args, char *initial_directory);
+int pwd_cmd();
+int echo_cmd(char **args, char **env);
+int env_cmd(char **env);
+int which_cmd(char **args, char **env);
+
 #endif /* SHELL_H */
