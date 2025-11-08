@@ -8,6 +8,12 @@ int builtin(char **args, char **env, char *init_dir) {
   } else if (!strcmp(args[0], "pwd")) {
     return pwd_cmd();
 
+  } else if (!strcmp(args[0], "echo")) {
+    return echo_cmd(args, env);
+
+  } else if (!strcmp(args[0], "env")) {
+    return env_cmd(env);
+
   } else if (!strcmp(args[0], "exit")) {
     exit(EXIT_SUCCESS);
 
