@@ -1,5 +1,5 @@
 assert_test = executable(
-  'simple_test',
+  'assert_test',
   'assert_test.c',
   include_directories: inc_dir,
 )

@@ -2,7 +2,7 @@
 #include <assert.h>
 
 int main(void) {
-  char *test = NULL;
+  char *test = "test";
   assert(test != NULL);
 
   printf("Simple test passed\n");

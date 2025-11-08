@@ -1,10 +1,10 @@
 #include "shell.h"
-#include <stddef.h>
 
 // built-in: cd pwd exit echo alias source which type env setenv unsetenv
 
 // TODO: cd, cd ~
 int cd_cmd(char **args, char *init_dir) {
+  (void)init_dir;
   if (chdir(args[1]) == -1) { // change wd
     perror("cd");
     return EXIT_FAILURE;
@@ -25,6 +25,7 @@ int pwd_cmd(void) {
 }
 
 int echo_cmd(char **args, char **env) {
+  (void)env;
   if (args[1] != NULL && !strcmp(args[1], "-n")) { // checks for -n flag
     for (size_t i = 2; args[i]; i++) {
       printf("%s ", args[i]);

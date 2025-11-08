@@ -23,11 +23,11 @@ int builtin(char **args, char **env, char *init_dir) {
   return EXIT_SUCCESS;
 }
 
-void event_loop(char **env) {
+static void event_loop(char **env) {
   char *input = NULL;    // storing input value
   size_t input_size = 0; // storing input size
 
-  char **args;                    // storing arguments
+  char **args = NULL;             // storing arguments
   char *init_dir = getenv("PWD"); // storing initial directory
 
   while (1) {
