@@ -9,14 +9,14 @@ static void event_loop(char **env) {
   char *init_dir = getenv("PWD"); // storing initial directory
 
   while (1) {
-    printf("ゝ");                                    // ctrl+k *5
-    if (getline(&input, &input_size, stdin) == -1) { // EOF, ctrl+dmain
-      if (feof(stdin))                               // checks for EOF
-        break;               // handles EOF gracefully, and exits the loop
-      else if (errno != 0) { // checks for an actual error
-        perror("getline");
+    printf("ゝ"); // ctrl+k *5
+    if (getline(&input, &input_size, stdin) == -1) {
+      if (feof(stdin)) { // checks EOF, and breaks the loop
+        printf("\n");
         break;
       }
+      perror("getline");
+      break;
     }
     // printf("cmd: %s", input);
 

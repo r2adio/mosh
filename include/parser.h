@@ -1,5 +1,6 @@
-#ifndef PARSER_H
-#define PARSER_H
+#pragma once
+
+#define _GNU_SOURCE
 
 #include <assert.h>
 #include <limits.h>
@@ -10,5 +11,3 @@
 char **parser(char *input);
 void free_tokens(char **tokens);
 int builtin(char **args, char **env, char *init_dir);
-
-#endif // PARSER_H

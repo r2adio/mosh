@@ -1,4 +1,6 @@
-#ifndef BUILTIN_H
+#pragma once
+
+#define _GNU_SOURCE
 
 #include <assert.h>
 #include <stdio.h>
@@ -13,5 +15,3 @@ int pwd_cmd(void);
 int echo_cmd(char **args, char **env);
 int env_cmd(char **env);
 int which_cmd(char **args, char **env);
-
-#endif // !BUILTIN_H
