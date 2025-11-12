@@ -1,4 +1,4 @@
-#include "shell.h"
+#include "parser.h"
 
 int main() {
   char input[] = "  ls   -l  -a  ";
