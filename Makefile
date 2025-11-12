@@ -4,7 +4,7 @@ all: test run
 
 build:
 	meson setup build
-	ninja -C build
+	ninja -C build -v
 
 run: build
 	./build/mosh

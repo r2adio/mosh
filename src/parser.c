@@ -1,4 +1,4 @@
-#include "shell.h"
+#include "parser.h"
 
 // parse user input into tokens
 char **parser(char *input) {

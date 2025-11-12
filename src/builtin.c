@@ -1,4 +1,27 @@
-#include "shell.h"
+#include "builtin.h"
+
+// built-in: cd pwd exit echo alias source which type env setenv unsetenv
+int builtin(char **args, char **env, char *init_dir) {
+  if (!strcmp(args[0], "cd")) {
+    return cd_cmd(args, init_dir);
+
+  } else if (!strcmp(args[0], "pwd")) {
+    return pwd_cmd();
+
+  } else if (!strcmp(args[0], "echo")) {
+    return echo_cmd(args, env);
+
+  } else if (!strcmp(args[0], "env")) {
+    return env_cmd(env);
+
+  } else if (!strcmp(args[0], "exit")) {
+    exit(EXIT_SUCCESS);
+
+  } else {
+    // binary: ls grep find cat cp mv rm mkdir tar
+  }
+  return EXIT_SUCCESS;
+}
 
 // built-in: cd pwd exit echo alias source which type env setenv unsetenv
 
