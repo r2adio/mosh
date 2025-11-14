@@ -10,6 +10,13 @@ project(
 inc_dir = include_directories('include')
 
 subdir('src')
+subdir('lib_')
 subdir('test')
 
-executable('mosh', src_files, include_directories: inc_dir, link_with: mosh_lib)
+executable(
+  'mosh',
+  src_files,
+  include_directories: inc_dir,
+  link_with: [mosh_lib],
+  dependencies: mosh_deps,
+)
