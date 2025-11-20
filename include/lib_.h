@@ -6,4 +6,5 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int strcmp_(char *s1, char *s2);
+// compares 2 strings(s1, s2) upto n characters
+int strcmp_(char *s1, char *s2, size_t n);

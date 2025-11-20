@@ -1,20 +1,21 @@
 #include "builtin.h"
+#include "lib_.h"
 
 // built-in: cd pwd exit echo alias source which type env setenv unsetenv
 int builtin(char **args, char **env, char *init_dir) {
-  if (!strcmp(args[0], "cd")) {
+  if (!strcmp_(args[0], "cd", 2)) {
     return cd_cmd(args, init_dir);
 
-  } else if (!strcmp(args[0], "pwd")) {
+  } else if (!strcmp_(args[0], "pwd", 3)) {
     return pwd_cmd();
 
-  } else if (!strcmp(args[0], "echo")) {
+  } else if (!strcmp_(args[0], "echo", 4)) {
     return echo_cmd(args, env);
 
-  } else if (!strcmp(args[0], "env")) {
+  } else if (!strcmp_(args[0], "env", 3)) {
     return env_cmd(env);
 
-  } else if (!strcmp(args[0], "exit")) {
+  } else if (!strcmp_(args[0], "exit", 4)) {
     exit(EXIT_SUCCESS);
 
   } else {
@@ -49,7 +50,7 @@ int pwd_cmd(void) {
 
 int echo_cmd(char **args, char **env) {
   (void)env;
-  if (args[1] != NULL && !strcmp(args[1], "-n")) { // checks for -n flag
+  if (args[1] != NULL && !strcmp_(args[1], "-n", 2)) { // checks for -n flag
     for (size_t i = 2; args[i]; i++) {
       printf("%s ", args[i]);
     }
