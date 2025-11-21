@@ -60,7 +60,7 @@ int echo_cmd(char **args, char **env) {
       if (args[i][0] == '$') { // checks env vars
         printf("%s ", getenv(args[i] + 1));
       } else if (args[i][0] == '"' &&
-                 args[i][strlen(args[i]) - 1] == '"') { // checks for quotes
+                 args[i][strlen_(args[i]) - 1] == '"') { // checks for quotes
         printf("%s ", args[i] + 1); // FIX: doesn't rm closing quote
       } else {
         printf("%s ", args[i]);

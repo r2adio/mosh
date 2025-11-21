@@ -6,7 +6,6 @@
 #include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
 char **parser(char *input);
 void free_tokens(char **tokens);

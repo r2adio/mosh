@@ -19,6 +19,6 @@ int main() {
   }
 
   free_tokens(tokens);
-  printf("Parser test passed\n");
+  printf("parser(input) test passed\n");
   return EXIT_SUCCESS;
 }
