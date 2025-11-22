@@ -10,4 +10,6 @@
 int strcmp_(char *s1, char *s2, size_t n);
 
 // counts the number of characters in a given string
-int strlen_(char *s);
+size_t strlen_(char *s);
+
+int printf_();

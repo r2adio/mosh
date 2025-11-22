@@ -1,6 +1,10 @@
 lib_ = static_library(
   'lib_',
-  files('strcmp_.c', 'strlen_.c'),
+  files(
+    'printf_.c',
+    'strcmp_.c',
+    'strlen_.c',
+  ),
   include_directories: inc_dir,
 )
 
