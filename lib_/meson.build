@@ -1,6 +1,7 @@
 lib_ = static_library(
   'lib_',
   files(
+    'getenv_.c',
     'strcmp_.c',
     'strlen_.c',
   ),
