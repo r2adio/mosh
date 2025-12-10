@@ -5,7 +5,6 @@
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <unistd.h>
 
 int builtin(char **args, char **env, char *init_dir);

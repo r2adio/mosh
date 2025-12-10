@@ -1,20 +1,21 @@
 #include "builtin.h"
+#include "lib_.h"
 
 // built-in: cd pwd exit echo alias source which type env setenv unsetenv
 int builtin(char **args, char **env, char *init_dir) {
-  if (!strcmp(args[0], "cd")) {
+  if (!strcmp_(args[0], "cd", 2) && args[0][2] == '\0') {
     return cd_cmd(args, init_dir);
 
-  } else if (!strcmp(args[0], "pwd")) {
+  } else if (!strcmp_(args[0], "pwd", 3) && args[0][3] == '\0') {
     return pwd_cmd();
 
-  } else if (!strcmp(args[0], "echo")) {
+  } else if (!strcmp_(args[0], "echo", 4) && args[0][4] == '\0') {
     return echo_cmd(args, env);
 
-  } else if (!strcmp(args[0], "env")) {
+  } else if (!strcmp_(args[0], "env", 3) && args[0][3] == '\0') {
     return env_cmd(env);
 
-  } else if (!strcmp(args[0], "exit")) {
+  } else if (!strcmp_(args[0], "exit", 4) && args[0][4] == '\0') {
     exit(EXIT_SUCCESS);
 
   } else {
@@ -49,7 +50,7 @@ int pwd_cmd(void) {
 
 int echo_cmd(char **args, char **env) {
   (void)env;
-  if (args[1] != NULL && !strcmp(args[1], "-n")) { // checks for -n flag
+  if (args[1] && !strcmp_(args[1], "-n", 2) && args[1][2] == '\0') {
     for (size_t i = 2; args[i]; i++) {
       printf("%s ", args[i]);
     }
@@ -59,8 +60,11 @@ int echo_cmd(char **args, char **env) {
       if (args[i][0] == '$') { // checks env vars
         printf("%s ", getenv(args[i] + 1));
       } else if (args[i][0] == '"' &&
-                 args[i][strlen(args[i]) - 1] == '"') { // checks for quotes
-        printf("%s ", args[i] + 1); // FIX: doesn't rm closing quote
+                 args[i][strlen_(args[i]) - 1] == '"') { // checks for quotes
+        size_t len = strlen_(args[i]);
+        if (len >= 2) {
+          printf("%.*s ", (int)(len - 2), args[i] + 1);
+        }
       } else {
         printf("%s ", args[i]);
       }
