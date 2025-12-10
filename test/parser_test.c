@@ -5,18 +5,13 @@ int main() {
   char input[] = "  ls   -l  -a  ";
   char **tokens = parser(input);
 
-  if (strcmp_(tokens[0], "ls", 2) != 0) {
-    return EXIT_FAILURE;
-  }
-  if (strcmp_(tokens[1], "-l", 2) != 0) {
-    return EXIT_FAILURE;
-  }
-  if (strcmp_(tokens[2], "-a", 2) != 0) {
-    return EXIT_FAILURE;
-  }
-  if (tokens[3] != NULL) {
-    return EXIT_FAILURE;
-  }
+  assert(strcmp_(tokens[0], "ls", 2) == 0 && tokens[0][2] == '\0');
+
+  assert(strcmp_(tokens[1], "-l", 2) == 0 && tokens[1][2] == '\0');
+
+  assert(strcmp_(tokens[2], "-a", 2) == 0 && tokens[2][2] == '\0');
+
+  assert(tokens[3] == NULL);
 
   free_tokens(tokens);
   printf("parser(input) test passed\n");
