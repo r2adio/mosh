@@ -8,7 +8,7 @@ int builtin(char **args, char **env, char *init_dir) {
     return cd_cmd(args, init_dir);
 
   } else if (!strcmp_(args[0], "pwd", 3) && args[0][3] == '\0') {
-    return pwd_cmd();
+    return pwd_cmd(args);
 
   } else if (!strcmp_(args[0], "echo", 4) && args[0][4] == '\0') {
     return echo_cmd(args, env);
@@ -23,6 +23,7 @@ int builtin(char **args, char **env, char *init_dir) {
     exit(EXIT_SUCCESS);
 
   } else {
+    printf("mosh: command not found: %s\n", args[0]);
     // binary: ls grep find cat cp mv rm mkdir tar
   }
   return EXIT_SUCCESS;
@@ -41,7 +42,11 @@ int cd_cmd(char **args, char *init_dir) {
   return EXIT_SUCCESS;
 }
 
-int pwd_cmd(void) {
+int pwd_cmd(char **args) {
+  if (args[1]) {
+    printf("pwd: too many arguments\n");
+    return EXIT_FAILURE;
+  }
   char *cwd = getcwd(NULL, 0); // use dynamic memory allocation
   if (cwd == NULL) {
     perror("pwd");
@@ -62,7 +67,7 @@ int echo_cmd(char **args, char **env) {
   } else {
     for (size_t i = 1; args[i]; i++) {
       if (args[i][0] == '$') { // checks env vars
-        printf("%s ", getenv(args[i] + 1));
+        printf("%s ", getenv_(args[i] + 1, env));
       } else if (args[i][0] == '"' &&
                  args[i][strlen_(args[i]) - 1] == '"') { // checks for quotes
         size_t len = strlen_(args[i]);
@@ -108,29 +113,35 @@ int which_cmd(char **args, char **env) {
   static char path[MAX_INPUT];   // stores the full PATH
 
   path_env = getenv_("PATH", env);
-  if (!path_env)
+  if (!path_env) {
     perror("getenv_");
+    return EXIT_FAILURE;
+  }
 
   path_temp = strdup(path_env); // duplicates the PATH
-  if (!path_temp)
+  if (!path_temp) {
     perror("strdup");
+    free(path_env);
+    return EXIT_FAILURE;
+  }
 
   // tokenizes PATH into individual dirs {`:` -> delimiter}
-  token = strtok(path_temp, ":");
+  token = strtok(path_temp, ":"); // strtok: doesnt allocate memory for `token`
+  // `token` points to the memory block pointed by `path_temp`
   while (token) {
     snprintf(path, sizeof(path), "%s/%s", token,
              args[1]);             // concatenates the command's path
     if (access(path, X_OK) == 0) { // access: checks if file exists
       printf("%s\n", path);        // prints the command's path
       free(path_temp);
+      free(path_env);
       return EXIT_SUCCESS;
     }
     token = strtok(NULL, ":");
   }
   printf("%s not found\n", args[1]);
 
-  free(path_env);
   free(path_temp);
-  free(token);
+  free(path_env);
   return EXIT_SUCCESS;
 }

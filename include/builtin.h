@@ -11,7 +11,7 @@
 int builtin(char **args, char **env, char *init_dir);
 
 int cd_cmd(char **args, char *initial_directory);
-int pwd_cmd(void);
+int pwd_cmd(char **args);
 int echo_cmd(char **args, char **env);
 int env_cmd(char **env);
 int which_cmd(char **args, char **env);
