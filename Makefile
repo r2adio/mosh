@@ -12,5 +12,9 @@ run: build
 test: build
 	meson test -C build --print-errorlogs
 
+debug:
+	meson setup build --buildtype=debug
+	ninja -C build -v
+
 clean:
 	rm -r build/ .cache/

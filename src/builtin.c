@@ -107,26 +107,24 @@ int which_cmd(char **args, char **env) {
   }
 
   // not a built-in command
-  static char *path_env = NULL;  // stores PATH value
-  static char *path_temp = NULL; // duplicate of PATH
-  static char *token = NULL;     // tokenizes dir's PATH
-  static char path[MAX_INPUT];   // stores the full PATH
-
-  path_env = getenv_("PATH", env);
+  char *path_env = getenv_("PATH", env); // stores PATH value
   if (!path_env) {
     perror("getenv_");
     return EXIT_FAILURE;
   }
 
-  path_temp = strdup(path_env); // duplicates the PATH
+  char *path_temp = strdup(path_env); // duplicates the PATH
   if (!path_temp) {
     perror("strdup");
     free(path_env);
     return EXIT_FAILURE;
   }
 
+  char path[MAX_INPUT]; // stores the full PATH
+
   // tokenizes PATH into individual dirs {`:` -> delimiter}
-  token = strtok(path_temp, ":"); // strtok: doesnt allocate memory for `token`
+  char *token =
+      strtok(path_temp, ":"); // strtok: doesnt allocate memory for `token`
   // `token` points to the memory block pointed by `path_temp`
   while (token) {
     snprintf(path, sizeof(path), "%s/%s", token,
@@ -134,7 +132,6 @@ int which_cmd(char **args, char **env) {
     if (access(path, X_OK) == 0) { // access: checks if file exists
       printf("%s\n", path);        // prints the command's path
       free(path_temp);
-      free(path_env);
       return EXIT_SUCCESS;
     }
     token = strtok(NULL, ":");
@@ -142,6 +139,5 @@ int which_cmd(char **args, char **env) {
   printf("%s not found\n", args[1]);
 
   free(path_temp);
-  free(path_env);
   return EXIT_SUCCESS;
 }
