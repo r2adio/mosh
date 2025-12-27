@@ -1,9 +1,7 @@
 fs = import('fs')
 test_src = files(
   'builtin_test.c',
-  'parser_test.c',
-  'strcmp_test.c',
-  'strlen_test.c',
+  'lib_test.c',
 )
 
 foreach t : test_src
