@@ -1,0 +1,48 @@
+#+HTML: <img src="https://github.com/user-attachments/assets/b6620d29-5388-4118-a7c0-ab764e32606f" alt="MOSH" width="400">
+
+Mosh is a simple shell written in C and, provides a command-line interface for executing commands and interacting with the operating system.
+
+** Features
+
+- Simple and lightweight.
+- Provides a basic command-line interface.
+- Supports built-in commands.
+- Supports tab completion.
+
+** Prerequisites
+
+To build and run Mosh, you will need the following tools:
+- *GNU Make:* For building the project.
+- *A C compiler:* Preferably a C23 compliant compiler.
+
+** Usage
+
+Build and run the project:
+
+#+begin_src sh
+# compiles the project
+make
+# runs the shell executable
+./build/bin/mosh
+#+end_src
+
+** Built-in Commands:
+
+Mosh provides the following built-in commands:
+
+- *cd [directory]* : Change the current working directory.
+- *pwd* : Print the current working directory.
+- *echo [arguments]* : Print the arguments to the standard output.
+- *env* : Print the environment variables.
+- *which [command]* : Search for a command in the PATH.
+- *help* : Display a list of built-in commands.
+- *help [command]* : Display help for a specific command.
+- *exit* : Exit the shell.
+
+** Contributing
+
+Contributions are welcome! If you find a bug or have a suggestion, please open an issue or submit a pull request.
+
+** License
+
+This project is licensed under the MIT License. See the [[file:./LICENSE][License]] for more information.
