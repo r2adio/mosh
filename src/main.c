@@ -9,22 +9,17 @@ static void event_loop(char **env) {
   char *init_dir = getenv("PWD"); // storing initial directory
 
   while (1) {
-    printf("ゝ"); // ctrl+k *5
+    fprintf(stdout, "ゝ"); // ctrl+k *5
     if (getline(&input, &input_size, stdin) == -1) {
       if (feof(stdin)) { // checks EOF, and breaks the loop
-        printf("\n");
+        putchar('\n');
         break;
       }
       perror("getline");
       break;
     }
-    // printf("cmd: %s", input);
 
     args = parser(input);
-
-    // for (size_t i = 0; args[i]; i++) {
-    //   printf("Args: %s\n", args[i]);
-    // }
 
     if (args[0] != NULL) {
       builtin(args, env, init_dir);

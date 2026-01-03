@@ -1,6 +1,5 @@
 ![logo](https://github.com/user-attachments/assets/b6620d29-5388-4118-a7c0-ab764e32606f)
 
-
 Mosh is a simple shell written in C. It provides a basic command-line interface for interacting with the operating system.
 
 ## Features

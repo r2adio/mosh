@@ -17,10 +17,10 @@ APP_SRC := src/main.c
 # Library sources that are part of the main application logic
 MOSH_LIB_SRC := src/builtin.c src/parser.c
 # Core utility library sources
-CORE_LIB_SRC := lib_/getenv_.c lib_/strcmp_.c lib_/strlen_.c
+CORE_LIB_SRC := utils/getenv_.c
 
 # Test sources
-TEST_SRC := test/builtin_test.c test/lib_test.c
+TEST_SRC := test/builtin_test.c
 
 # Object Files:
 
@@ -57,7 +57,7 @@ $(TARGET): $(APP_OBJ) $(ALL_LIB_OBJS)
 
 # The 'test' target depends on the test executables and then runs them
 test: $(TEST_TARGETS)
-	@echo "--- Running Tests ---"
+	@echo "\n--- Running Tests ---"
 	@for test_exe in $(TEST_TARGETS); do \
 		echo "=> Running $$test_exe"; \
 		./$$test_exe; \

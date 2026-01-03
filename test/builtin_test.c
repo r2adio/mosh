@@ -10,6 +10,7 @@ int main() {
   assert(builtin(tokens, env, init_dir) != EXIT_FAILURE);
 
   free_tokens(tokens);
-  printf("builtin(char **args, char **env, char *init_dir) test passed\n");
+  fprintf(stdout,
+          "builtin(char **args, char **env, char *init_dir) test passed\n");
   return EXIT_SUCCESS;
 }
