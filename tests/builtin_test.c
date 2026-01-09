@@ -1,4 +1,5 @@
 #include "builtin.h"
+#include "colors.h"
 #include "parser.h"
 
 int main() {
@@ -10,7 +11,8 @@ int main() {
   assert(builtin(tokens, env, init_dir) != EXIT_FAILURE);
 
   free_tokens(tokens);
-  fprintf(stdout,
-          "builtin(char **args, char **env, char *init_dir) test passed\n");
+  fprintf(
+      stdout, GREEN
+      "builtin(char **args, char **env, char *init_dir) test passed\n" RESET);
   return EXIT_SUCCESS;
 }
