@@ -1,6 +1,5 @@
 #include "builtin.h"
 #include "utils.h"
-#include <stdio.h>
 
 typedef int (*builtin_fn)(char **args, char **env, char *init_dir);
 
@@ -29,15 +28,37 @@ int builtin(char **args, char **env, char *init_dir) {
   return EXIT_SUCCESS;
 }
 
-// TODO: cd, cd ~
 int cd_cmd(char **args, char **env, char *init_dir) {
-  (void)env;
   (void)init_dir;
-  if (chdir(args[1]) == -1) { // change wd
-    perror("cd");
-    return EXIT_FAILURE;
+  if (args[1] == NULL) { // cd with no arguments
+    char *home = getenv_("HOME", env);
+    if (!home) {
+      perror("getenv_");
+      return EXIT_FAILURE;
+    }
+    if (chdir(home) == -1) {
+      perror("cd");
+      return EXIT_FAILURE;
+    }
+    return EXIT_SUCCESS;
   }
-  fprintf(stdout, "cd: %s\n", args[1]);
+  if (chdir(args[1]) == -1) { // cd with argument
+    if (args[1][0] == '~') {
+      char *home = getenv_("HOME", env);
+      if (!home) {
+        perror("getenv_");
+        return EXIT_FAILURE;
+      }
+      if (chdir(home) == -1) {
+        perror("cd(home)");
+        return EXIT_FAILURE;
+      }
+    } else {
+      perror("cd");
+      return EXIT_FAILURE;
+    }
+  }
+  // fprintf(stdout, "cd: %s\n", args[1]);
   return EXIT_SUCCESS;
 }
 
