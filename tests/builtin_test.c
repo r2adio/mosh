@@ -5,10 +5,28 @@
 int main() {
   char **env = NULL;
   char *init_dir = NULL;
-  char input[] = "cd src/";
-  char **tokens = parser(input);
 
-  assert(builtin(tokens, env, init_dir) != EXIT_FAILURE);
+  // TEST: token parser
+  char input[] = "cd /usr/local/bin/";
+  char **tokens = parser(input);
+  assert(strcmp(tokens[1], "/usr/local/bin/") == 0);
+
+  // TEST: builtin and cd command
+  int cd_res = builtin(tokens, env, init_dir);
+  assert(cd_res == EXIT_SUCCESS);
+  free_tokens(tokens);
+
+  // TEST: pwd command
+  char input_pwd[] = "pwd";
+  tokens = parser(input_pwd);
+  int res = builtin(tokens, env, init_dir);
+  assert(res == EXIT_SUCCESS);
+
+  // TEST: cwd is /usr/local/bin
+  char cwd[PATH_MAX];
+  getcwd(cwd, sizeof(cwd));
+  printf("cwd: %s\n", cwd);
+  assert(strstr(cwd, "/usr/local/bin") != NULL);
 
   free_tokens(tokens);
   fprintf(
