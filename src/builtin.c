@@ -15,9 +15,10 @@ builtin_t builtins[] = {
 
 int builtin(char **args, char **env, char *init_dir) {
   for (size_t i = 0; i < BUILTIN_COUNT; i++) {
-    if (strncmp(args[0], builtins[i].name, strlen(builtins[i].name)) == 0) {
+    if (strncmp(args[0], builtins[i].name, strlen(builtins[i].name)) == 0 &&
+        args[0][strlen(builtins[i].name)] == '\0') {
 
-      if (strncmp(args[0], "exit", strlen("exit")) == 0)
+      if (strncmp(args[0], "exit", strlen("exit")) == 0 && args[0][4] == '\0')
         exit(EXIT_SUCCESS);
 
       return builtins[i].fn(args, env, init_dir);
@@ -25,7 +26,7 @@ int builtin(char **args, char **env, char *init_dir) {
   }
 
   fprintf(stdout, "mosh: command not found: %s\n", args[0]);
-  return EXIT_SUCCESS;
+  return EXIT_FAILURE;
 }
 
 int cd_cmd(char **args, char **env, char *init_dir) {
@@ -80,7 +81,6 @@ int pwd_cmd(char **args, char **env, char *init_dir) {
 }
 
 int echo_cmd(char **args, char **env, char *init_dir) {
-  (void)env;
   (void)init_dir;
   if (args[1] && !strncmp(args[1], "-n", strlen("-n")) && args[1][2] == '\0') {
     for (size_t i = 2; args[i]; i++) {

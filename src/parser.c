@@ -7,7 +7,8 @@ char **parser(char *input) {
       malloc(buf_size * sizeof(char *)); // allocate memory for tokens
   char *token = NULL;                    // token
   size_t position = 0;                   // position in tokens
-  size_t token_len = 0;                  // token length
+  size_t token_len;                      // token length
+  size_t i = 0;
 
   // check for malloc errors
   if (!tokens) {
@@ -15,7 +16,7 @@ char **parser(char *input) {
     exit(EXIT_FAILURE);
   }
 
-  for (size_t i = 0; input[i]; i++) {
+  while (input[i] != '\0') {
     // skips whitespace characters: space, newline, tab, carriage return, and
     // alert
     while (input[i] == ' ' || input[i] == '\n' || input[i] == '\t' ||
@@ -25,7 +26,9 @@ char **parser(char *input) {
     if (input[i] == '\0')
       break;
 
+    token_len = 0;
     token = &input[i];
+
     // check for null terminator, space, newline, tab, carriage return, and
     // alert
     while (input[i] != '\0' && input[i] != ' ' && input[i] != '\n' &&
@@ -47,7 +50,6 @@ char **parser(char *input) {
     }
     tokens[position][token_len] = '\0'; // null terminator at the end of token
     position++;
-    token_len = 0; // reset token length
   }
   tokens[position] = NULL; // null terminator at the end of tokens array
 
