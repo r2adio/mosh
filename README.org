@@ -1,30 +1,130 @@
-#+HTML: <img src="https://github.com/user-attachments/assets/b6620d29-5388-4118-a7c0-ab764e32606f" alt="MOSH" width="400">
+#+HTML: <p align="center"><img src="https://github.com/user-attachments/assets/b6620d29-5388-4118-a7c0-ab764e32606f" alt="MOSH" width="400"></p>
 
-Mosh is a simple shell written in C and, provides a command-line interface for executing commands and interacting with the operating system.
+MOSH (Minimal/Modular Shell) is a simple shell written in C that provides a command-line interface for executing commands and interacting with the operating system.
+Started as an educational project, MOSH is evolving into a usable daily shell with comprehensive features.
+
+** Development Roadmap
+
+MOSH follows a 5-phase development plan to evolve from a learning project to a full-featured daily shell:
+
+*** Phase 1: Critical Fixes (1-2 days)
+- [x] Fix memory leak bug in token cleanup
+- [x] Add system-wide installation support
+- [_] Ensure compilation and basic functionality
+
+*** Phase 2: Core Functionality (1-2 weeks)
+- [_] Implement external command execution (fork/exec/waitpid)
+- [_] Add signal handling, Ctrl+C and Ctrl+Z
+- [_] Implement help command system
+- [_] Improve error handling and exit codes
+
+*** Phase 3: Advanced Shell Features (2-4 weeks)
+- [_] Add pipes for command chaining
+- [_] Implement redirection (>, >>, <)
+- [_] Add background processes (&) with job control
+- [_] Environment management commands (setenv, unsetenv, export)
+
+*** Phase 4: User Experience (1-2 weeks)
+- [_] Implement tab completion using readline library
+- [_] Add command history with arrow navigation
+- [_] Custom prompts with git status and configuration
+- [_] Configuration file support (.moshrc)
+
+*** Phase 5: Polish & Advanced Features (Ongoing)
+- [_] Basic shell scripting support (variables, loops, conditionals)
+- [_] Plugin system for custom commands
+- [_] Performance optimization
+- [_] Comprehensive documentation and man pages
 
 ** Features
 
-- Simple and lightweight.
-- Provides a basic command-line interface.
-- Supports built-in commands.
-- Supports tab completion.
+*** Currently Implemented
+- Simple and lightweight shell with custom prompt (ゝ)
+- Basic command-line interface with REPL loop
+- Built-in commands: cd, pwd, echo, env, which, help, exit
+- Parser and tokenization system
+- Environment variable support in echo command
+- Comprehensive build system with testing
+- Colored output and error messages
+
+*** Planned Features
+- Tab completion for commands and paths
+- Command history with up/down arrow navigation
+- Pipes and redirection (|, >, >>, <)
+- Background processes and job control
+- Configuration file support (.moshrc)
+- Shell scripting capabilities
+- Plugin system for extensibility
 
 ** Prerequisites
 
-To build and run Mosh, you will need the following tools:
+To build and run MOSH, you will need the following tools:
 - *GNU Make:* For building the project.
 - *A C compiler:* Preferably a C23 compliant compiler.
+- *Optional:* readline library (for future tab completion features)
+
+** Building & Installation
+
+*** Quick Start
+
+#+begin_src sh
+# Build the project
+make
+
+# Run the shell
+./build/bin/mosh
+#+end_src
+
+*** Available Make Targets
+
+- *make* - Build main executable
+- *make test* - Run test suite
+- *make clean* - Clean build artifacts
+- *make compile_commands* - Generate IDE support files
+- *make install* - Install system-wide (requires sudo)
+- *make uninstall* - Remove system-wide installation
+
+*** System-wide Installation
+
+#+begin_src sh
+# Install to /usr/local/bin (requires sudo)
+sudo make install
+
+# Uninstall
+sudo make uninstall
+#+end_src
 
 ** Usage
 
-Build and run the project:
+*** Basic Usage
+
+Start the shell and begin entering commands:
 
 #+begin_src sh
-# compiles the project
-make
-# runs the shell executable
 ./build/bin/mosh
+ゝ pwd
+/home/user/mosh
+ゝ ls
+src  include  utils  tests  README.org
+ゝ exit
 #+end_src
+
+*** Built-in Commands
+
+MOSH provides the following built-in commands:
+
+- *cd [directory]* : Change the current working directory. Supports ~ for home directory.
+- *pwd* : Print the current working directory.
+- *echo [arguments]* : Print arguments to standard output. Supports -n flag, environment variables ($VAR), and quoted strings.
+- *env* : Print all environment variables.
+- *which [command]* : Search for a command in the PATH and show its location.
+- *help* : Display a list of built-in commands.
+- *help [command]* : Display detailed help for a specific command.
+- *exit* : Exit the shell.
+
+*** External Commands
+
+Currently, MOSH supports built-in commands only. External command execution is planned for Phase 2 of the development roadmap.
 
 ** Built-in Commands:
 
@@ -39,9 +139,79 @@ Mosh provides the following built-in commands:
 - *help [command]* : Display help for a specific command.
 - *exit* : Exit the shell.
 
+** Testing
+
+*** Running Tests
+
+#+begin_src sh
+# Run all tests
+make test
+#+end_src
+
+*** Test Coverage
+
+The test suite covers:
+- Built-in command functionality
+- Parser tokenization
+- Directory operations
+- Error handling
+- Memory management
+
+*** Sample Test Output
+
+#+begin_src sh
+$ make test
+--- Running Tests ---
+==> Running build/bin/tests/builtin_test
+cwd: /usr/local/bin
+builtin(char **args, char **env, char *init_dir) test passed
+--- Tests Finished ---
+#+end_src
+
+** Development
+
+*** Project Structure
+
+- *src/* - Main source files (main.c, builtin.c, parser.c)
+- *include/* - Header files for the project
+- *utils/* - Utility functions and helpers
+- *tests/* - Test files and test suite
+- *build/* - Build artifacts and compiled binaries
+
+*** Architecture Overview
+
+MOSH follows a modular architecture:
+- Main loop in *src/main.c* handles the REPL
+- Built-in commands implemented in *src/builtin.c*
+- Input parsing and tokenization in *src/parser.c*
+- Utility functions in *utils/* directory
+
 ** Contributing
 
-Contributions are welcome! If you find a bug or have a suggestion, please open an issue or submit a pull request.
+Contributions are welcome! Please follow these guidelines:
+
+1. Fork the repository
+2. Create a feature branch (git checkout -b feature/amazing-feature)
+3. Make your changes
+4. Add tests for new functionality
+5. Ensure all tests pass (make test)
+6. Commit your changes
+7. Push to the feature branch
+8. Open a pull request
+
+** Troubleshooting
+
+*** Common Issues
+
+- *Compilation errors:* Ensure you have a C23 compliant compiler
+- *Permission denied:* Use sudo for system-wide installation
+- *Missing dependencies:* Install GNU Make and build tools
+
+*** Getting Help
+
+- Open an issue on GitHub for bug reports
+- Check existing issues for known problems
+- Review the development roadmap for planned features
 
 ** License
 

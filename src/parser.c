@@ -58,7 +58,7 @@ char **parser(char *input) {
 
 // free the allocated memory for tokens
 void free_tokens(char **tokens) {
-  if (tokens) // check if tokens is not null
+  if (!tokens) // check if tokens is not null
     return;
 
   for (size_t i = 0; tokens[i]; i++) {

@@ -49,7 +49,7 @@ TARGET := $(TARGET_DIR)/mosh
 TEST_TARGETS := $(patsubst tests/%.c,$(TARGET_DIR)/tests/%,$(TEST_SRC))
 
 
-.PHONY: all clean test compile_commands
+.PHONY: all clean test compile_commands install uninstall
 
 # Main Build Rules:
 # =================
@@ -103,3 +103,15 @@ $(OBJ_DIR)/%.o: %.c
 clean:
 	@echo "$(RED)Cleaning up...$(RESET)"
 	@rm -rf $(BUILD_DIR) $(CACHE_DIR)
+
+# Installation rules
+install: $(TARGET)
+	@echo "$(BLUE)Installing MOSH to /usr/local/bin...$(RESET)"
+	@sudo cp $(TARGET) /usr/local/bin/mosh
+	@echo "$(GREEN)Installation complete!$(RESET)"
+	@echo "$(BLUE)Run 'mosh' from anywhere to start the shell.$(RESET)"
+
+uninstall:
+	@echo "$(RED)Uninstalling MOSH...$(RESET)"
+	@sudo rm -f /usr/local/bin/mosh
+	@echo "$(GREEN)Uninstallation complete.$(RESET)"
