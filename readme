@@ -1,0 +1,130 @@
+MOSH is a simple shell written in C, that provides a cli interface for interacting with the operating system.
+
+
+* Development Roadmap
+
+MOSH follows a 5-phase development plan to evolve from a learning project to a full-featured daily shell:
+** Phase 1: Critical Fixes (1-2 days)
+- [✓] Fix memory leak bug in token cleanup 
+- [✓] Add system-wide installation support 
+
+** Phase 2: Core Functionality (1-2 weeks)
+- [✗] Implement external command execution (fork/exec/waitpid)
+- [◐] Add signal handling, Ctrl+C and Ctrl+Z 
+- [✗] Implement help command system
+- [◎] Improve error handling and exit codes
+
+** Phase 3: Advanced Shell Features (2-4 weeks)
+- [✗] Add pipes for command chaining
+- [✗] Implement redirection (>, >>, <)
+- [✗] Add background processes (&) with job control
+- [✗] Environment management commands (setenv, unsetenv, export)
+
+** Phase 4: User Experience (1-2 weeks)
+- [✗] Implement tab completion using readline library
+- [✗] Add command history with arrow navigation
+- [✗] Custom prompts with git status and configuration
+- [✗] Configuration file support (.moshrc)
+
+** Phase 5: Polish & Advanced Features (Ongoing)
+- [✗] Basic shell scripting support (variables, loops, conditionals)
+- [✗] Plugin system for custom commands
+- [✗] Performance optimization
+- [✗] Comprehensive documentation and man pages
+
+
+* Features
+
+** Currently Implemented
+- Simple and lightweight shell with custom prompt (ゝ)
+- Basic command-line interface with REPL loop
+- Built-in commands: cd, pwd, echo, env, which, help, exit
+- Parser and tokenization system
+- Environment variable support in echo command
+- Comprehensive build system with testing
+- Colored output and error messages
+
+** Planned Features
+- Tab completion for commands and paths
+- Command history with up/down arrow navigation
+- Pipes and redirection (|, >, >>, <)
+- Background processes and job control
+- Configuration file support (.moshrc)
+- Shell scripting capabilities
+- Plugin system for extensibility
+
+
+* Prerequisites
+
+To build and run MOSH, you will need the following tools:
+- GNU Make:* For building the project.
+- A C compiler:* Preferably a C23 compliant compiler.
+- Optional:* readline library (for future tab completion features)
+
+
+* Building & Installation
+
+Available Make Targets:
+- make* - Build main executable
+- make run* - Run the shell
+- make test* - Run test suite
+- make clean* - Clean build artifacts
+- make compile_commands* - Generate IDE support files
+- make install* - Install system-wide (requires sudo)
+- make uninstall* - Remove system-wide installation
+
+
+* Built-in Commands
+
+Mosh provides the following built-in commands:
+- cd [directory]* : Change the current working directory.
+- pwd* : Print the current working directory.
+- echo [arguments]* : Print the arguments to the standard output.
+- env* : Print the environment variables.
+- which [command]* : Search for a command in the PATH.
+- help* : Display a list of built-in commands.
+- help [command]* : Display help for a specific command.
+- exit* : Exit the shell.
+
+
+* Development
+
+** Project Structure
+- src/* - Main source files (main.c, builtin.c, parser.c)
+- include/* - Header files for the project
+- utils/* - Utility functions and helpers
+- tests/* - Test files and test suite
+- build/* - Build artifacts and compiled binaries
+
+** Architecture Overview
+MOSH follows a modular architecture:
+- Main loop in src/main.c* handles the REPL
+- Built-in commands implemented in src/builtin.c*
+- Input parsing and tokenization in src/parser.c*
+- Utility functions in utils/* directory
+
+
+* Contributing
+
+Contributions are welcome! Please follow these guidelines:
+1. Fork the repository
+2. Create a feature branch (git checkout -b feature/amazing-feature)
+3. Make your changes
+4. Add tests for new functionality
+5. Ensure all tests pass (make test)
+6. Commit your changes
+7. Push to the feature branch
+8. Open a pull request
+
+
+* Troubleshooting
+
+** Common Issues
+- Compilation errors:* Ensure you have a C23 compliant compiler
+- Permission denied:* Use sudo for system-wide installation
+- Missing dependencies:* Install GNU Make and build tools
+
+** Getting Help
+- Open an issue on GitHub for bug reports
+- Check existing issues for known problems
+- Review the development roadmap for planned features

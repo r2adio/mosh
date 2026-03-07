@@ -1,6 +1,3 @@
-# Makefile for mosh
-
-CC := cc
 CFLAGS := -std=c23 -g -O2 -Wall -Wextra -Wpedantic -Iinclude
 LDFLAGS :=
 
@@ -54,6 +51,10 @@ TEST_TARGETS := $(patsubst tests/%.c,$(TARGET_DIR)/tests/%,$(TEST_SRC))
 # Main Build Rules:
 # =================
 all: $(TARGET) # to make all, first make $(TARGET)
+
+run: $(TARGET)
+	@echo "$(GREEN)Running MOSH...$(RESET)"
+	@./$(TARGET)
 
 # Rule to link the main executable
 $(TARGET): $(APP_OBJ) $(ALL_LIB_OBJS) # to build target(build/bin/mosh), first need all the object files
