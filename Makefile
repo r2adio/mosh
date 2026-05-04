@@ -1,104 +1,65 @@
-CFLAGS := -std=c23 -g -O2 -Wall -Wextra -Wpedantic -Iinclude -Iextras/unity
+CC ?= cc
+
+CPPFLAGS := -Iinclude -Iextras/unity
+CFLAGS := -std=c23 -g -O2 -Wall -Wextra -Wpedantic
 LDFLAGS :=
 
-# Directories
 BUILD_DIR := build
 CACHE_DIR := .cache
 OBJ_DIR := $(BUILD_DIR)/obj
-TARGET_DIR := $(BUILD_DIR)/bin
+BIN_DIR := $(BUILD_DIR)/bin
 
-# Color definitions
-BLUE         := \033[34m
-GREEN        := \033[32m
-RED          := \033[31m
-YELLOW       := \033[33m
-RESET        := \033[0m
-
-# Source Files:
-# Main application sources
 APP_SRC := src/main.c
-# Library sources that are part of the main application logic
-MOSH_LIB_SRC := $(filter-out $(APP_SRC), $(wildcard src/*.c))
-# Core utility library sources
+MOSH_LIB_SRC := $(filter-out $(APP_SRC),$(wildcard src/*.c))
 CORE_LIB_SRC := $(wildcard utils/*.c)
-
-# Test sources
+UNITY_SRC := extras/unity/unity.c
 TEST_SRC := $(wildcard tests/*_test.c)
 
-# Object Files:
-
-# Generate object file paths by replacing .c with .o and prepending the object directory
 APP_OBJ := $(patsubst %.c,$(OBJ_DIR)/%.o,$(APP_SRC))
 MOSH_LIB_OBJ := $(patsubst %.c,$(OBJ_DIR)/%.o,$(MOSH_LIB_SRC))
 CORE_LIB_OBJ := $(patsubst %.c,$(OBJ_DIR)/%.o,$(CORE_LIB_SRC))
+UNITY_OBJ := $(patsubst %.c,$(OBJ_DIR)/%.o,$(UNITY_SRC))
 TEST_OBJ := $(patsubst %.c,$(OBJ_DIR)/%.o,$(TEST_SRC))
-UNITY_OBJ := $(OBJ_DIR)/extras/unity/unity.o
 
+ALL_LIB_OBJ := $(MOSH_LIB_OBJ) $(CORE_LIB_OBJ)
+TARGET := $(BIN_DIR)/mosh
+TEST_TARGET := $(BIN_DIR)/tests/mosh_tests
 
-# All library objects needed for linking
-ALL_LIB_OBJS := $(MOSH_LIB_OBJ) $(CORE_LIB_OBJ)
+.PHONY: all run test test-build clean compile_commands install uninstall
 
-TARGET := $(TARGET_DIR)/mosh
-TEST_TARGET := $(TARGET_DIR)/tests/mosh_tests
-
-
-.PHONY: all clean test compile_commands install uninstall
-
-# Main Build Rules:
-# =================
-all: $(TARGET) # to make all, first make $(TARGET)
+all: $(TARGET)
 
 run: $(TARGET)
-	@echo "$(GREEN)Running MOSH...$(RESET)"
+	@echo "Running MOSH..."
 	@./$(TARGET)
 
-# Rule to link the main executable
-$(TARGET): $(APP_OBJ) $(ALL_LIB_OBJS) # to build target(build/bin/mosh), first need all the object files
-	@echo "$(BLUE)Linking main executable:$(RESET) $(YELLOW)$@$(RESET)" # $@ -> target (the name of the target)
-	@mkdir -p $(dir $@) # $(dir $@) -> the directory part of the target (build/bin)
-	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS) # $^ -> all the object files (prerequisites)
-
-# Unity Test Rules:
 test: $(TEST_TARGET)
-	@echo "$(GREEN)Running Unity tests...$(RESET)"
+	@echo "Running Unity tests..."
 	@./$(TEST_TARGET)
 
-$(TEST_TARGET): $(TEST_OBJ) $(ALL_LIB_OBJS) $(UNITY_OBJ)
-	@echo "$(BLUE)Linking Unity test executable:$(RESET) $(YELLOW)$@$(RESET)"
+test-build: $(TEST_TARGET)
+
+$(TARGET): $(APP_OBJ) $(ALL_LIB_OBJ)
 	@mkdir -p $(dir $@)
-	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
+	$(CC) $(CPPFLAGS) $(CFLAGS) -o $@ $^ $(LDFLAGS)
 
-# IDE tooling rule
-compile_commands:
-	@echo "$(RED)Generating compile_commands.json using bear...$(RESET)"
-	bear -- $(MAKE) all test
+$(TEST_TARGET): $(TEST_OBJ) $(ALL_LIB_OBJ) $(UNITY_OBJ)
+	@mkdir -p $(dir $@)
+	$(CC) $(CPPFLAGS) $(CFLAGS) -o $@ $^ $(LDFLAGS)
 
-# Generic rule to compile any .c file from its source location to the object directory
 $(OBJ_DIR)/%.o: %.c
-	@echo "$(BLUE)Compiling:$(RESET) $(YELLOW)$<$(RESET)" # $< -> the first prerequisite (the source file)
 	@mkdir -p $(dir $@)
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(CPPFLAGS) $(CFLAGS) -c $< -o $@
 
-$(OBJ_DIR)/extras/unity/%.o: extras/unity/%.c
-	@echo "$(BLUE)Compiling Unity:$(RESET) $(YELLOW)$<$(RESET)"
-	@mkdir -p $(dir $@)
-	$(CC) $(CFLAGS) -c $< -o $@
+compile_commands:
+	@$(MAKE) clean
+	bear -- $(MAKE) all test-build
 
-
-
-# Rule to clean up all build artifacts
 clean:
-	@echo "$(RED)Cleaning up...$(RESET)"
-	@rm -rf $(BUILD_DIR) $(CACHE_DIR)
+	@rm -rf $(BUILD_DIR) $(CACHE_DIR) compile_commands.json
 
-# Installation rules
 install: $(TARGET)
-	@echo "$(BLUE)Installing MOSH to /usr/local/bin...$(RESET)"
 	@sudo cp $(TARGET) /usr/local/bin/mosh
-	@echo "$(GREEN)Installation complete!$(RESET)"
-	@echo "$(BLUE)Run 'mosh' from anywhere to start the shell.$(RESET)"
 
 uninstall:
-	@echo "$(RED)Uninstalling MOSH...$(RESET)"
 	@sudo rm -f /usr/local/bin/mosh
-	@echo "$(GREEN)Uninstallation complete.$(RESET)"
