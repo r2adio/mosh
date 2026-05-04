@@ -6,7 +6,6 @@ BUILD_DIR := build
 CACHE_DIR := .cache
 OBJ_DIR := $(BUILD_DIR)/obj
 TARGET_DIR := $(BUILD_DIR)/bin
-COMPILE_COMMANDS_DIR := $(BUILD_DIR)/compile_commands
 
 # Color definitions
 BLUE         := \033[34m
@@ -34,8 +33,6 @@ MOSH_LIB_OBJ := $(patsubst %.c,$(OBJ_DIR)/%.o,$(MOSH_LIB_SRC))
 CORE_LIB_OBJ := $(patsubst %.c,$(OBJ_DIR)/%.o,$(CORE_LIB_SRC))
 TEST_OBJ := $(patsubst %.c,$(OBJ_DIR)/%.o,$(TEST_SRC))
 
-# All object files for compile_commands.json
-ALL_OBJS_FOR_IDE := $(APP_OBJ) $(MOSH_LIB_OBJ) $(CORE_LIB_OBJ) $(TEST_OBJ)
 
 # All library objects needed for linking
 ALL_LIB_OBJS := $(MOSH_LIB_OBJ) $(CORE_LIB_OBJ)
@@ -80,24 +77,16 @@ $(TARGET_DIR)/tests/%: $(OBJ_DIR)/tests/%.o $(ALL_LIB_OBJS)
 	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
 
 # IDE tooling rule
-compile_commands: $(ALL_OBJS_FOR_IDE)
-	@echo "$(RED)Generating compile_commands.json...$(RESET)"
-	@echo "[" > $(BUILD_DIR)/compile_commands.json
-	@sh -c 'find $(COMPILE_COMMANDS_DIR) -name "*.json" -exec cat {} + | paste -sd "," -' >> $(BUILD_DIR)/compile_commands.json
-	@echo "]" >> $(BUILD_DIR)/compile_commands.json
+compile_commands:
+	@echo "$(RED)Generating compile_commands.json using bear...$(RESET)"
+	bear -- $(MAKE) all test
 
 # Generic rule to compile any .c file from its source location to the object directory
-# This rule also generates a JSON compilation database fragment.
 $(OBJ_DIR)/%.o: %.c
 	@echo "$(BLUE)Compiling:$(RESET) $(YELLOW)$<$(RESET)" # $< -> the first prerequisite (the source file)
 	@mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) -c $< -o $@
-	@mkdir -p $(dir $(addprefix $(COMPILE_COMMANDS_DIR)/, $<.json))
-	@printf '{\n' > $(addprefix $(COMPILE_COMMANDS_DIR)/, $<.json)
-	@printf '  "directory": "%s",\n' "$(CURDIR)" >> $(addprefix $(COMPILE_COMMANDS_DIR)/, $<.json)
-	@printf '  "command": "%s",\n' "$(CC) $(CFLAGS) -c $< -o $@" >> $(addprefix $(COMPILE_COMMANDS_DIR)/, $<.json)
-	@printf '  "file": "%s"\n' "$<" >> $(addprefix $(COMPILE_COMMANDS_DIR)/, $<.json)
-	@printf '}\n' >> $(addprefix $(COMPILE_COMMANDS_DIR)/, $<.json)
+
 
 
 # Rule to clean up all build artifacts

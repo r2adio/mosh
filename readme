@@ -1,9 +1,8 @@
 MOSH is a simple shell written in C, that provides a cli interface for interacting with the operating system.
 
-
 * Development Roadmap
-
 MOSH follows a 5-phase development plan to evolve from a learning project to a full-featured daily shell:
+
 ** Phase 1: Critical Fixes (1-2 days)
 - [✓] Fix memory leak bug in token cleanup 
 - [✓] Add system-wide installation support 
@@ -69,7 +68,7 @@ Available Make Targets:
 - make run* - Run the shell
 - make test* - Run test suite
 - make clean* - Clean build artifacts
-- make compile_commands* - Generate IDE support files
+- make compile_commands - Generate IDE support files (requires `bear`)
 - make install* - Install system-wide (requires sudo)
 - make uninstall* - Remove system-wide installation
 
