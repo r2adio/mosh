@@ -1,4 +1,4 @@
-CFLAGS := -std=c23 -g -O2 -Wall -Wextra -Wpedantic -Iinclude
+CFLAGS := -std=c23 -g -O2 -Wall -Wextra -Wpedantic -Iinclude -Iextras/unity
 LDFLAGS :=
 
 # Directories
@@ -32,15 +32,14 @@ APP_OBJ := $(patsubst %.c,$(OBJ_DIR)/%.o,$(APP_SRC))
 MOSH_LIB_OBJ := $(patsubst %.c,$(OBJ_DIR)/%.o,$(MOSH_LIB_SRC))
 CORE_LIB_OBJ := $(patsubst %.c,$(OBJ_DIR)/%.o,$(CORE_LIB_SRC))
 TEST_OBJ := $(patsubst %.c,$(OBJ_DIR)/%.o,$(TEST_SRC))
+UNITY_OBJ := $(OBJ_DIR)/extras/unity/unity.o
 
 
 # All library objects needed for linking
 ALL_LIB_OBJS := $(MOSH_LIB_OBJ) $(CORE_LIB_OBJ)
 
-# final executable
 TARGET := $(TARGET_DIR)/mosh
-# using patsubst to replace .c with .o for the test executables
-TEST_TARGETS := $(patsubst tests/%.c,$(TARGET_DIR)/tests/%,$(TEST_SRC))
+TEST_TARGET := $(TARGET_DIR)/tests/mosh_tests
 
 
 .PHONY: all clean test compile_commands install uninstall
@@ -59,20 +58,13 @@ $(TARGET): $(APP_OBJ) $(ALL_LIB_OBJS) # to build target(build/bin/mosh), first n
 	@mkdir -p $(dir $@) # $(dir $@) -> the directory part of the target (build/bin)
 	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS) # $^ -> all the object files (prerequisites)
 
-# Test Build Rules:
-# The 'test' target depends on the test executables and then runs them
-test: $(TEST_TARGETS)
-	@echo "\n$(RED)--- Running Tests ---$(RESET)"
-	@for test_exe in $(TEST_TARGETS); do \
-		echo "$(BLUE)==> Running$(RESET) $(YELLOW)$()$$test_exe$(RESET)"; \
-		./$$test_exe; \
-	done
-	@echo "$(GREEN)--- Tests Finished ---$(RESET)"
+# Unity Test Rules:
+test: $(TEST_TARGET)
+	@echo "$(GREEN)Running Unity tests...$(RESET)"
+	@./$(TEST_TARGET)
 
-# Generic rule to link any test executable
-# A test executable depends on its own object file plus all library object files
-$(TARGET_DIR)/tests/%: $(OBJ_DIR)/tests/%.o $(ALL_LIB_OBJS)
-	@echo "$(BLUE)Linking test executable: $(RESET) $(YELLOW)$@$(RESET)"
+$(TEST_TARGET): $(TEST_OBJ) $(ALL_LIB_OBJS) $(UNITY_OBJ)
+	@echo "$(BLUE)Linking Unity test executable:$(RESET) $(YELLOW)$@$(RESET)"
 	@mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
 
@@ -84,6 +76,11 @@ compile_commands:
 # Generic rule to compile any .c file from its source location to the object directory
 $(OBJ_DIR)/%.o: %.c
 	@echo "$(BLUE)Compiling:$(RESET) $(YELLOW)$<$(RESET)" # $< -> the first prerequisite (the source file)
+	@mkdir -p $(dir $@)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(OBJ_DIR)/extras/unity/%.o: extras/unity/%.c
+	@echo "$(BLUE)Compiling Unity:$(RESET) $(YELLOW)$<$(RESET)"
 	@mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) -c $< -o $@
 

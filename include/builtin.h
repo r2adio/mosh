@@ -2,7 +2,6 @@
 
 #define _GNU_SOURCE
 
-#include <assert.h>
 #include <limits.h>
 #include <stdint.h>
 #include <stdio.h>
