@@ -8,8 +8,7 @@
  * @return The value of the environment variable, or NULL if not found
  */
 char *getenv_(const char *name, char **env) {
-  if (name == NULL || env == NULL)
-    return NULL;
+  if (name == NULL || env == NULL) return NULL;
 
   size_t name_len = strlen(name);
   for (size_t i = 0; env[i]; i++) {

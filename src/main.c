@@ -18,12 +18,8 @@ static void event_loop(char **env) {
       perror("getline");
       break;
     }
-
     args = parser(input);
-
-    if (args[0] != NULL) {
-      builtin(args, env, init_dir);
-    }
+    if (args[0] != NULL) builtin(args, env, init_dir);
   }
   free_tokens(args); // free allocated memory for tokens
 }
