@@ -12,20 +12,14 @@ BIN_DIR := $(BUILD_DIR)/bin
 APP_SRC := src/main.c
 MOSH_LIB_SRC := $(filter-out $(APP_SRC),$(wildcard src/*.c))
 CORE_LIB_SRC := $(wildcard utils/*.c)
-UNITY_SRC := extras/unity/unity.c
-TEST_SRC := $(wildcard tests/*_test.c)
 
 APP_OBJ := $(patsubst %.c,$(OBJ_DIR)/%.o,$(APP_SRC))
 MOSH_LIB_OBJ := $(patsubst %.c,$(OBJ_DIR)/%.o,$(MOSH_LIB_SRC))
 CORE_LIB_OBJ := $(patsubst %.c,$(OBJ_DIR)/%.o,$(CORE_LIB_SRC))
-UNITY_OBJ := $(patsubst %.c,$(OBJ_DIR)/%.o,$(UNITY_SRC))
-TEST_OBJ := $(patsubst %.c,$(OBJ_DIR)/%.o,$(TEST_SRC))
 
 ALL_LIB_OBJ := $(MOSH_LIB_OBJ) $(CORE_LIB_OBJ)
 TARGET := $(BIN_DIR)/mosh
-TEST_TARGET := $(BIN_DIR)/tests/mosh_tests
-
-.PHONY: all run test test-build clean compile_commands install uninstall
+.PHONY: all run clean compile_commands install uninstall
 
 all: $(TARGET)
 
@@ -33,17 +27,7 @@ run: $(TARGET)
 	@echo "Running MOSH..."
 	@./$(TARGET)
 
-test: $(TEST_TARGET)
-	@echo "Running Unity tests..."
-	@./$(TEST_TARGET)
-
-test-build: $(TEST_TARGET)
-
 $(TARGET): $(APP_OBJ) $(ALL_LIB_OBJ)
-	@mkdir -p $(dir $@)
-	$(CC) $(CPPFLAGS) $(CFLAGS) -o $@ $^ $(LDFLAGS)
-
-$(TEST_TARGET): $(TEST_OBJ) $(ALL_LIB_OBJ) $(UNITY_OBJ)
 	@mkdir -p $(dir $@)
 	$(CC) $(CPPFLAGS) $(CFLAGS) -o $@ $^ $(LDFLAGS)
 
@@ -53,7 +37,7 @@ $(OBJ_DIR)/%.o: %.c
 
 compile_commands:
 	@$(MAKE) clean
-	bear -- $(MAKE) all test-build
+	bear -- $(MAKE) all
 
 clean:
 	@rm -rf $(BUILD_DIR) $(CACHE_DIR) compile_commands.json

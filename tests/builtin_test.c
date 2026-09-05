@@ -3,8 +3,10 @@
 #include "builtin.h"
 #include "parser.h"
 
-void setUp(void) {}
-void tearDown(void) {}
+void setUp(void) {
+}
+void tearDown(void) {
+}
 
 static void test_parser_splits_cd_command(void) {
   char input[] = "cd /usr/local/bin/";
